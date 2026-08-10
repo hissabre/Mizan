@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mizan</title>
+
+<meta name="theme-color" content="#0E1B1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mizan">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<style>
+  :root{
+    --ink:#0E1B1A;
+    --ink-2:#12211F;
+    --surface:#1B2E2C;
+    --surface-2:#22403B;
+    --line:#2E4A45;
+    --text:#F3EFE3;
+    --text-dim:#9FB3AC;
+    --gold:#D4A94F;
+    --gold-soft:#3A3423;
+    --teal:#4FA391;
+    --teal-soft:#1D3630;
+    --blue:#6FA8C9;
+    --blue-soft:#1C333C;
+    --copper:#C98B5C;
+    --copper-soft:#332420;
+    --rose:#C97B7B;
+    --radius:18px;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:radial-gradient(1200px 800px at 50% -10%, #16302B 0%, var(--ink) 55%);
+    color:var(--text); font-family:var(--sans); min-height:100%;
+    display:flex; justify-content:center;
+  }
+  #shell{
+    width:100%; max-width:480px; min-height:100vh; position:relative;
+    display:flex; flex-direction:column; background:var(--ink-2);
+    box-shadow:0 0 60px rgba(0,0,0,.4);
+  }
+  ::selection{background:var(--gold); color:var(--ink);}
+  button{font-family:inherit; cursor:pointer;}
+  h1,h2,h3{font-family:var(--serif); font-weight:400; margin:0;}
+  .muted{color:var(--text-dim);}
+  .hidden{display:none !important;}
+
+  /* ---------- Onboarding ---------- */
+  #onboarding{
+    flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    padding:36px 28px; text-align:center; gap:22px;
+  }
+  #onboarding .mark{width:96px; height:96px;}
+  #onboarding h1{font-size:34px; color:var(--gold); letter-spacing:.5px;}
+  #onboarding p{color:var(--text-dim); line-height:1.6; max-width:340px; font-size:15px;}
+  #onboarding input{
+    width:100%; max-width:300px; padding:14px 16px; border-radius:14px; border:1px solid var(--line);
+    background:var(--surface); color:var(--text); font-size:16px; text-align:center; font-family:var(--sans);
+  }
+  #onboarding input:focus{outline:2px solid var(--gold); border-color:transparent;}
+  .btn-primary{
+    background:var(--gold); color:#241B08; border:none; padding:14px 30px; border-radius:100px;
+    font-size:15px; font-weight:700; letter-spacing:.3px; width:100%; max-width:300px;
+  }
+  .btn-primary:active{transform:scale(.98);}
+  .btn-primary:disabled{opacity:.4;}
+
+  /* ---------- Header ---------- */
+  header{
+    padding:18px 20px 14px; display:flex; align-items:center; justify-content:space-between;
+    position:sticky; top:0; background:linear-gradient(var(--ink-2) 80%, transparent); z-index:5;
+  }
+  header .greet{font-family:var(--serif); font-size:20px;}
+  header .greet span{color:var(--gold);}
+  header .level-pill{
+    display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line);
+    padding:6px 12px 6px 6px; border-radius:100px; font-size:12px;
+  }
+  header .level-pill .lvl-num{
+    background:var(--gold); color:#241B08; width:22px; height:22px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;
+  }
+
+  /* ---------- Views ---------- */
+  #views{flex:1; overflow-y:auto; padding:4px 20px 100px;}
+  .view{animation:fade .25s ease;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+
+  /* Scale (signature element) */
+  .scale-wrap{display:flex; flex-direction:column; align-items:center; padding:6px 0 18px;}
+  .scale-caption{font-size:12px; color:var(--text-dim); margin-top:10px; letter-spacing:.4px;}
+  .scale-caption b{color:var(--gold); font-weight:600;}
+
+  .day-strip{display:flex; justify-content:space-between; align-items:center; margin:2px 0 18px;}
+  .day-strip .stage-label{font-size:12px; color:var(--text-dim);}
+  .day-strip .stage-label b{color:var(--text); font-family:var(--serif); font-size:15px; display:block; margin-top:2px;}
+  .xp-track{flex:1; margin-left:16px;}
+  .xp-bar-bg{height:6px; border-radius:4px; background:var(--surface); overflow:hidden; margin-top:6px;}
+  .xp-bar-fill{height:100%; background:linear-gradient(90deg, var(--teal), var(--gold)); border-radius:4px; transition:width .5s ease;}
+
+  .section-title{font-size:13px; text-transform:uppercase; letter-spacing:1.2px; color:var(--text-dim); margin:22px 0 10px;}
+
+  .pillar-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+    padding:16px 16px 6px; margin-bottom:14px;
+  }
+  .pillar-head{display:flex; align-items:center; gap:12px; margin-bottom:6px;}
+  .pillar-icon{width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .pillar-icon svg{width:19px; height:19px;}
+  .pillar-name{font-family:var(--serif); font-size:17px;}
+  .pillar-sub{font-size:12px; color:var(--text-dim);}
+  .pillar-progress{margin-left:auto; font-size:12px; color:var(--text-dim); font-variant-numeric:tabular-nums;}
+
+  .task-row{
+    display:flex; align-items:center; gap:12px; padding:12px 2px; border-top:1px solid var(--line);
+  }
+  .task-row:first-of-type{border-top:1px solid var(--line);}
+  .checkbox{
+    width:24px; height:24px; border-radius:8px; border:2px solid var(--line); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; transition:.15s;
+  }
+  .checkbox.checked{background:var(--gold); border-color:var(--gold);}
+  .checkbox svg{width:14px; height:14px; opacity:0;}
+  .checkbox.checked svg{opacity:1;}
+  .task-label{flex:1; font-size:14.5px; line-height:1.35;}
+  .task-row.done .task-label{color:var(--text-dim); text-decoration:line-through; text-decoration-color:var(--line);}
+  .task-xp{font-size:11px; color:var(--gold); font-variant-numeric:tabular-nums;}
+
+  /* Identities */
+  .identity-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:16px;
+    margin-bottom:12px;
+  }
+  .identity-card.locked{opacity:.45;}
+  .identity-top{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .identity-name{font-family:var(--serif); font-size:16.5px;}
+  .identity-mastery{margin-left:auto; font-size:11px; padding:4px 10px; border-radius:100px; background:var(--surface-2); color:var(--text-dim);}
+  .identity-bar-bg{height:5px; background:var(--ink); border-radius:4px; overflow:hidden;}
+  .identity-bar-fill{height:100%; border-radius:4px; transition:width .5s ease;}
+  .identity-desc{font-size:12px; color:var(--text-dim); margin-top:8px; line-height:1.5;}
+
+  /* Journal */
+  .journal-q{margin-bottom:16px;}
+  .journal-q label{font-size:13px; color:var(--gold); display:block; margin-bottom:6px; font-family:var(--serif); font-size:15px;}
+  .journal-q textarea{
+    width:100%; min-height:64px; background:var(--surface); border:1px solid var(--line); border-radius:14px;
+    color:var(--text); padding:12px 14px; font-family:var(--sans); font-size:14px; resize:vertical; line-height:1.5;
+  }
+  .journal-q textarea:focus{outline:2px solid var(--gold); border-color:transparent;}
+  .entry{
+    background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:10px;
+  }
+  .entry .entry-date{font-size:11px; color:var(--gold); letter-spacing:.4px; text-transform:uppercase; margin-bottom:6px;}
+  .entry p{margin:4px 0; font-size:13px; line-height:1.5; color:var(--text-dim);}
+  .entry p b{color:var(--text); font-weight:600;}
+
+  /* Progress */
+  .stat-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:18px;}
+  .stat-card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; text-align:center;}
+  .stat-card .num{font-family:var(--serif); font-size:26px; color:var(--gold);}
+  .stat-card .lbl{font-size:11px; color:var(--text-dim); margin-top:2px;}
+  .badge-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .badge{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; display:flex; gap:10px; align-items:flex-start;}
+  .badge.locked{opacity:.35;}
+  .badge .b-icon{font-size:20px; line-height:1;}
+  .badge .b-name{font-size:13px; font-weight:600;}
+  .badge .b-desc{font-size:11px; color:var(--text-dim); margin-top:2px; line-height:1.4;}
+  .dev-row{margin-top:24px; padding-top:16px; border-top:1px dashed var(--line);}
+  .dev-row .dev-label{font-size:11px; color:var(--text-dim); margin-bottom:8px; letter-spacing:.4px;}
+  .btn-ghost{
+    background:transparent; border:1px solid var(--line); color:var(--text-dim); font-size:12px;
+    padding:10px 14px; border-radius:100px; width:100%;
+  }
+  .btn-ghost:active{border-color:var(--gold); color:var(--gold);}
+
+  /* Nav */
+  nav{
+    position:sticky; bottom:0; display:flex; background:rgba(18,33,31,.92); backdrop-filter:blur(10px);
+    border-top:1px solid var(--line); padding:8px 6px calc(10px + env(safe-area-inset-bottom));
+  }
+  nav button{
+    flex:1; background:none; border:none; color:var(--text-dim); display:flex; flex-direction:column;
+    align-items:center; gap:4px; padding:6px 2px; font-size:10.5px; letter-spacing:.2px;
+  }
+  nav button svg{width:20px; height:20px;}
+  nav button.active{color:var(--gold);}
+
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%) translateY(20px); opacity:0;
+    background:var(--gold); color:#241B08; padding:10px 18px; border-radius:100px; font-size:13px; font-weight:600;
+    transition:.3s; pointer-events:none; z-index:50; white-space:nowrap;
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  /* ---------- Forge Protocol ---------- */
+  input, textarea, button{font-size:16px;}
+  #views{padding-bottom:calc(112px + env(safe-area-inset-bottom));-webkit-overflow-scrolling:touch;}
+  header{padding-top:calc(18px + env(safe-area-inset-top));}
+  nav{padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+  .forge-hero{background:linear-gradient(145deg,#243C38,#182A28);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin:4px 0 16px;}
+  .forge-kicker{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);font-weight:700;}
+  .forge-title{font-family:var(--serif);font-size:25px;margin:5px 0;}
+  .forge-sub{font-size:13px;color:var(--text-dim);line-height:1.5;}
+  .forge-score{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;}
+  .forge-score-card{background:rgba(14,27,26,.55);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;}
+  .forge-score-card .n{font-family:var(--serif);font-size:21px;color:var(--gold);}
+  .forge-score-card .l{font-size:10px;color:var(--text-dim);margin-top:2px;}
+  .forge-section{margin:18px 0;}
+  .forge-section h3{font-size:17px;margin-bottom:8px;}
+  .forge-task{display:flex;align-items:flex-start;gap:11px;padding:13px 2px;border-top:1px solid var(--line);}
+  .forge-task:first-child{border-top:0;}
+  .forge-check{width:24px;height:24px;border-radius:8px;border:2px solid var(--line);flex:0 0 24px;display:flex;align-items:center;justify-content:center;}
+  .forge-task.done .forge-check{background:var(--gold);border-color:var(--gold);}
+  .forge-check:after{content:"✓";font-weight:800;color:#241B08;opacity:0;}
+  .forge-task.done .forge-check:after{opacity:1;}
+  .forge-task-main{flex:1;}
+  .forge-task-title{font-size:14px;line-height:1.35;}
+  .forge-task-note{font-size:11px;color:var(--text-dim);line-height:1.4;margin-top:3px;}
+  .forge-xp{font-size:11px;color:var(--gold);white-space:nowrap;}
+  .forge-progress{height:7px;background:var(--surface);border-radius:8px;overflow:hidden;margin-top:10px;}
+  .forge-progress>div{height:100%;background:linear-gradient(90deg,var(--teal),var(--gold));border-radius:8px;transition:width .3s;}
+  .forge-principle{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;color:var(--text-dim);font-size:13px;line-height:1.55;}
+  .forge-principle b{color:var(--text);}
+  .forge-warning{font-size:11px;color:var(--text-dim);line-height:1.45;margin-top:10px;}
+</style>
+</head>
+<body>
+<div id="shell">
+
+  <div id="onboarding">
+    <svg class="mark" viewBox="0 0 100 100" fill="none">
+      <path d="M50 8 V52" stroke="#D4A94F" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M15 30 L50 18 L85 30" stroke="#D4A94F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M15 30 Q15 46 30 46 Q45 46 45 30" stroke="#4FA391" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path d="M55 30 Q55 46 70 46 Q85 46 85 30" stroke="#4FA391" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <line x1="15" y1="30" x2="45" y2="30" stroke="#D4A94F" stroke-width="2"/>
+      <line x1="55" y1="30" x2="85" y2="30" stroke="#D4A94F" stroke-width="2"/>
+      <circle cx="50" cy="14" r="3" fill="#D4A94F"/>
+      <path d="M35 52 H65 L60 62 H40 Z" fill="#D4A94F"/>
+      <path d="M30 62 H70 V68 H30 Z" fill="#3A3423" stroke="#D4A94F" stroke-width="1.2"/>
+    </svg>
+    <h1>Mizan</h1>
+    <p>Not a habit tracker. A companion for who you're becoming — spiritually, physically, mentally, and financially. One small, honest day at a time.</p>
+    <input id="nameInput" type="text" placeholder="What's your name?" maxlength="24" autocomplete="off">
+    <button class="btn-primary" id="startBtn" disabled>Begin Day 1</button>
+  </div>
+
+  <div id="app" class="hidden" style="display:flex; flex-direction:column; min-height:100vh;">
+    <header>
+      <div class="greet">As-salamu alaykum, <span id="userName"></span></div>
+      <div class="level-pill"><span class="lvl-num" id="levelNum">1</span><span id="levelName">Foundation</span></div>
+    </header>
+
+    <div id="views">
+      <!-- TODAY -->
+      <section class="view" id="view-today">
+        <div class="scale-wrap">
+          <svg id="scaleSvg" width="220" height="130" viewBox="0 0 220 130">
+            <line x1="110" y1="18" x2="110" y2="100" stroke="#2E4A45" stroke-width="3" stroke-linecap="round"/>
+            <path d="M96 100 H124 L118 116 H102 Z" fill="#22403B"/>
+            <rect x="90" y="116" width="40" height="8" rx="3" fill="#22403B"/>
+            <g id="beam">
+              <line x1="30" y1="0" x2="190" y2="0" stroke="#D4A94F" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="110" cy="0" r="4" fill="#D4A94F"/>
+              <g id="panLeft">
+                <line x1="30" y1="0" x2="30" y2="26" stroke="#4FA391" stroke-width="1.6"/>
+                <path d="M14 26 Q30 42 46 26" stroke="#4FA391" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </g>
+              <g id="panRight">
+                <line x1="190" y1="0" x2="190" y2="26" stroke="#4FA391" stroke-width="1.6"/>
+                <path d="M174 26 Q190 42 206 26" stroke="#4FA391" stroke-width="2" fill="none" stroke-linecap="round"/>
+              </g>
+            </g>
+          </svg>
+          <div class="scale-caption" id="scaleCaption">Begin today's balance</div>
+        </div>
+
+        <div class="day-strip">
+          <div class="stage-label">Day <span id="dayNum">1</span> / 40<b id="stageName">Small beginnings</b></div>
+          <div class="xp-track">
+            <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-dim);">
+              <span id="xpNow">0 XP</span><span id="xpNext">next level</span>
+            </div>
+            <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpFill" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div id="pillarList"></div>
+      </section>
+
+
+      <!-- FORGE -->
+      <section class="view hidden" id="view-forge">
+        <div class="forge-hero"><div class="forge-kicker">Mizan // Forge Protocol</div><h2 class="forge-title">Become harder to break.</h2><div class="forge-sub">Civilian preparation inspired by elite-service principles: physical capacity, composure, competence, discipline, service and character. The goal is dependable performance under pressure — not military cosplay.</div><div class="forge-score"><div class="forge-score-card"><div class="n" id="forgeStreak">0</div><div class="l">Forge streak</div></div><div class="forge-score-card"><div class="n" id="forgeXp">0</div><div class="l">Forge XP</div></div><div class="forge-score-card"><div class="n" id="forgeDays">0</div><div class="l">Days forged</div></div></div></div>
+        <div class="forge-section"><h3>Today's protocol</h3><div class="forge-principle"><b>Standard:</b> Execute the plan without negotiating with yourself. Discomfort is part of training; pain, illness or unsafe conditions are reasons to modify or stop.</div><div class="forge-progress"><div id="forgeProgressFill" style="width:0%"></div></div><div id="forgeTaskList" style="margin-top:8px"></div></div>
+        <div class="forge-section"><h3>The 8 attributes</h3><div class="forge-principle"><b>Physical capacity</b> — strength, endurance, mobility and durability.<br><b>Discomfort tolerance</b> — stay composed while conditions are uncomfortable.<br><b>Discipline</b> — execute commitments regardless of mood.<br><b>Stress behavior</b> — think clearly when tired, rushed or frustrated.<br><b>Team behavior</b> — be useful, communicate, carry your share.<br><b>Self-management</b> — sleep, nutrition, recovery and preparation.<br><b>Competence</b> — navigation, first aid, learning, problem-solving and communication.<br><b>Character</b> — honesty, ownership, restraint and keeping your word.</div></div>
+        <div class="forge-section"><h3>Weekly standard</h3><div class="forge-principle">Once a week, complete a controlled assessment combining <b>physical effort + a cognitive task + a character task</b>. The objective is staying useful under fatigue, not destroying yourself.</div><div class="forge-warning">No reckless sleep deprivation, dangerous cold exposure, extreme dehydration, unsafe loads or self-inflicted injury. Forge is controlled stress and repeatable performance.</div></div>
+      </section>
+
+      <!-- IDENTITIES -->
+      <section class="view hidden" id="view-identities">
+        <h2 style="font-size:22px; margin-bottom:4px;">Your Seven Identities</h2>
+        <p class="muted" style="font-size:13px; margin:0 0 18px;">Every action strengthens who you're becoming. Identities grow slowly, through consistency — not one good day.</p>
+        <div id="identityList"></div>
+      </section>
+
+      <!-- JOURNAL -->
+      <section class="view hidden" id="view-journal">
+        <h2 style="font-size:22px; margin-bottom:4px;">Muhasabah</h2>
+        <p class="muted" style="font-size:13px; margin:0 0 18px;">A short evening reckoning with yourself.</p>
+        <div class="journal-q">
+          <label>What pleased Allah today?</label>
+          <textarea id="j1" placeholder="A moment, a choice, a small good deed..."></textarea>
+        </div>
+        <div class="journal-q">
+          <label>What needs improvement?</label>
+          <textarea id="j2" placeholder="Be honest, not harsh with yourself."></textarea>
+        </div>
+        <div class="journal-q">
+          <label>What will I do tomorrow?</label>
+          <textarea id="j3" placeholder="One concrete intention."></textarea>
+        </div>
+        <button class="btn-primary" id="saveJournalBtn" style="max-width:none; margin-bottom:22px;">Save today's reflection</button>
+        <div class="section-title">Past entries</div>
+        <div id="journalList"></div>
+      </section>
+
+      <!-- PROGRESS -->
+      <section class="view hidden" id="view-progress">
+        <h2 style="font-size:22px; margin-bottom:14px;">Progress</h2>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="num" id="statXp">0</div><div class="lbl">Total XP</div></div>
+          <div class="stat-card"><div class="num" id="statStreak">0</div><div class="lbl">Current streak</div></div>
+          <div class="stat-card"><div class="num" id="statBest">0</div><div class="lbl">Longest streak</div></div>
+          <div class="stat-card"><div class="num" id="statDay">1</div><div class="lbl">Journey day</div></div>
+        </div>
+        <div class="section-title">Achievements</div>
+        <div class="badge-grid" id="badgeGrid"></div>
+        <div class="dev-row">
+          <div class="dev-label">BETA TESTING — explore the journey faster</div>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <button class="btn-ghost" id="backDayBtn">← Back a day</button>
+            <button class="btn-ghost" id="advanceDayBtn">Skip forward →</button>
+          </div>
+          <button class="btn-ghost" id="resetDayBtn" style="margin-bottom:8px;">Restart journey at Day 1 (keep XP &amp; history)</button>
+          <button class="btn-ghost" id="eraseAllBtn" style="border-color:var(--rose); color:var(--rose);">Erase everything &amp; start over</button>
+        </div>
+      </section>
+    </div>
+
+    <nav>
+      <button data-view="today" class="active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 21s-7-4.35-9.5-8.5C.5 8.5 2.5 4.5 6.5 4.5c2 0 3.5 1 5.5 3 2-2 3.5-3 5.5-3 4 0 6 4 4 8C19 16.65 12 21 12 21Z"/></svg>
+        Today
+      </button>
+      <button data-view="forge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 3h10l2 5-7 13L5 8l2-5Z"/><path d="M7 3l5 18M17 3l-5 18M5 8h14"/></svg>Forge</button>
+      <button data-view="identities">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12,2 15,9 22,9 16.5,13.5 18.5,21 12,17 5.5,21 7.5,13.5 2,9 9,9"/></svg>
+        Identities
+      </button>
+      <button data-view="journal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h13a3 3 0 0 1 3 3v13H7a3 3 0 0 1-3-3V4Z"/><line x1="8" y1="9" x2="16" y2="9"/><line x1="8" y1="13" x2="14" y2="13"/></svg>
+        Journal
+      </button>
+      <button data-view="progress">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 20V10M12 20V4M20 20v-7"/></svg>
+        Progress
+      </button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var STORE_KEY = "mizan_state_v1";
+
+  function storageWorks(){
+    try{
+      var k = "__mizan_test__";
+      localStorage.setItem(k, "1");
+      localStorage.removeItem(k);
+      return true;
+    }catch(e){ return false; }
+  }
+  if(!storageWorks()){
+    document.body.innerHTML = '<div style="max-width:420px;margin:60px auto;padding:24px;font-family:-apple-system,sans-serif;color:#F3EFE3;background:#1B2E2C;border-radius:16px;line-height:1.6;">'+
+      '<h2 style="font-family:Georgia,serif;color:#D4A94F;margin-top:0;">Saved data is blocked</h2>'+
+      '<p>This browser mode won\'t let Mizan save your progress (this happens in Private Browsing, or when a file is opened inside another app\'s built-in viewer instead of Safari).</p>'+
+      '<p><b>To fix it:</b> open this file directly in Safari (not a preview/share-sheet viewer), and make sure Private Browsing is off. See the setup steps you were given for saving it to your Home Screen.</p>'+
+    '</div>';
+    return;
+  }
+
+
+  var ICONS = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="#241B08" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,12 9,18 20,6"/></svg>',
+    spiritual: '<svg viewBox="0 0 24 24" fill="none" stroke="#0E1B1A" stroke-width="1.8"><path d="M15.5 3.5A8 8 0 1 0 20.5 15 6.5 6.5 0 0 1 15.5 3.5Z"/></svg>',
+    physical: '<svg viewBox="0 0 24 24" fill="none" stroke="#0E1B1A" stroke-width="1.8"><path d="M6.5 6.5v11M17.5 6.5v11M3 9v6M21 9v6M6.5 12h11"/></svg>',
+    mental: '<svg viewBox="0 0 24 24" fill="none" stroke="#0E1B1A" stroke-width="1.8"><path d="M4 5h7v15H6a2 2 0 0 1-2-2Z"/><path d="M20 5h-7v15h5a2 2 0 0 0 2-2Z"/></svg>',
+    financial: '<svg viewBox="0 0 24 24" fill="none" stroke="#0E1B1A" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v10M9.5 9.3c0-1.3 1.1-2.1 2.5-2.1s2.5.8 2.5 1.9-1 1.7-2.5 1.9-2.5.8-2.5 1.9 1.1 1.9 2.5 1.9 2.5-.7 2.5-2"/></svg>'
+  };
+
+  var PILLARS = [
+    {id:"spiritual", name:"Spiritual", sub:"Servant of Allah", color:"var(--gold)", bg:"var(--gold-soft)", icon:ICONS.spiritual},
+    {id:"physical", name:"Physical", sub:"Warrior", color:"var(--teal)", bg:"var(--teal-soft)", icon:ICONS.physical},
+    {id:"mental", name:"Mental", sub:"Student", color:"var(--blue)", bg:"var(--blue-soft)", icon:ICONS.mental},
+    {id:"financial", name:"Financial", sub:"Builder", color:"var(--copper)", bg:"var(--copper-soft)", icon:ICONS.financial}
+  ];
+
+  // Progressive task config for Level 1 (Foundation), by 10-day stage.
+  var STAGES = [
+    {from:1, to:10, name:"Small beginnings", tasks:{
+      spiritual:[{id:"s1", label:"Pray all 5 prayers", xp:100}],
+      physical:[{id:"p1", label:"10-minute walk or stretch", xp:40}],
+      mental:[{id:"m1", label:"Read or learn for 10 minutes", xp:20}],
+      financial:[{id:"f1", label:"Log today's spending", xp:15}]
+    }},
+    {from:11, to:20, name:"Adding structure", tasks:{
+      spiritual:[{id:"s1", label:"Pray all 5 prayers", xp:100},{id:"s2", label:"Morning & evening adhkar", xp:30}],
+      physical:[{id:"p1", label:"10-minute walk or stretch", xp:40},{id:"p2", label:"Drink 8 cups of water", xp:10}],
+      mental:[{id:"m1", label:"Read or learn for 10 minutes", xp:20}],
+      financial:[{id:"f1", label:"Log today's spending", xp:15}]
+    }},
+    {from:21, to:30, name:"Raising quality", tasks:{
+      spiritual:[{id:"s1", label:"Pray all 5 prayers", xp:100},{id:"s2", label:"Morning & evening adhkar", xp:30},{id:"s3", label:"Pray on time / in congregation", xp:20}],
+      physical:[{id:"p1", label:"10-minute walk or stretch", xp:40},{id:"p2", label:"Drink 8 cups of water", xp:10}],
+      mental:[{id:"m1", label:"Read or learn for 10 minutes", xp:20},{id:"m2", label:"Write one lesson you reflected on", xp:20}],
+      financial:[{id:"f1", label:"Log today's spending", xp:15}]
+    }},
+    {from:31, to:40, name:"Full routine", tasks:{
+      spiritual:[{id:"s1", label:"Pray all 5 prayers", xp:100},{id:"s2", label:"Morning & evening adhkar", xp:30},{id:"s3", label:"Pray on time / in congregation", xp:20}],
+      physical:[{id:"p1", label:"20-minute full workout", xp:40},{id:"p2", label:"Drink 8 cups of water", xp:10}],
+      mental:[{id:"m1", label:"Read or learn for 10 minutes", xp:20},{id:"m2", label:"Write one lesson you reflected on", xp:20}],
+      financial:[{id:"f1", label:"Log today's spending", xp:15},{id:"f2", label:"Quick budget check-in", xp:15}]
+    }}
+  ];
+
+  var IDENTITIES = [
+    {id:"servant", name:"Servant of Allah", pillars:["spiritual"], color:"var(--gold)", desc:"Prayer, Qur'an, dhikr, character, and closeness to Allah."},
+    {id:"warrior", name:"Warrior", pillars:["physical"], color:"var(--teal)", desc:"Strength, discipline, sleep, nutrition, and resilience of the body."},
+    {id:"student", name:"Student", pillars:["mental"], color:"var(--blue)", desc:"Reading, learning, reflection, and sharpening the mind."},
+    {id:"builder", name:"Builder", pillars:["financial"], color:"var(--copper)", desc:"Money, budgeting, saving, and productive work."},
+    {id:"leader", name:"Leader", pillars:[], color:"#8f8f8f", desc:"Marriage, parenting, mentorship — unlocks at Level 5.", locked:true},
+    {id:"companion", name:"Companion", pillars:[], color:"#8f8f8f", desc:"Family, friends, and brotherhood — unlocks at Level 5.", locked:true},
+    {id:"legacy", name:"Legacy", pillars:[], color:"#8f8f8f", desc:"Teaching and building what outlives you — unlocks at Level 7.", locked:true}
+  ];
+
+  var MASTERY_LABELS = ["Novice","Consistent","Practicing","Disciplined","Excellent","Exemplar"];
+  var MASTERY_THRESHOLDS = [0,5,15,30,60,120];
+
+  var ACHIEVEMENTS = [
+    {id:"first_day", icon:"🌱", name:"First Step", desc:"Complete your first full day.", cond:function(s){return s.longestStreak>=1;}},
+    {id:"streak7", icon:"🔥", name:"7-Day Streak", desc:"Seven days in a row.", cond:function(s){return s.longestStreak>=7;}},
+    {id:"journal1", icon:"📖", name:"First Muhasabah", desc:"Write your first reflection.", cond:function(s){return Object.keys(s.journal).length>=1;}},
+    {id:"xp500", icon:"⭐", name:"500 XP", desc:"Earn 500 experience points.", cond:function(s){return s.xp>=500;}},
+    {id:"xp2000", icon:"✨", name:"2000 XP", desc:"Earn 2000 experience points.", cond:function(s){return s.xp>=2000;}},
+    {id:"day40", icon:"🏁", name:"Foundation Complete", desc:"Reach Day 40.", cond:function(s){return currentDay(s)>=40;}}
+  ];
+
+
+  // ---------- Forge Protocol ----------
+  var FORGE_TASKS=[{id:"ff1",title:"Train the body",note:"Complete today's planned strength, endurance, mobility or recovery session.",xp:35},{id:"ff2",title:"Do one thing you wanted to avoid",note:"A small, safe act of deliberate discipline. Finish it without bargaining.",xp:20},{id:"ff3",title:"Composure rep",note:"When frustration appears, pause, breathe, then choose the response instead of reacting.",xp:20},{id:"ff4",title:"Competence rep",note:"Spend 10 minutes learning a practical skill: navigation, first aid, language, memory, problem-solving or communication.",xp:20},{id:"ff5",title:"Carry your share",note:"Do one useful thing for another person without needing credit.",xp:20},{id:"ff6",title:"Own the standard",note:"Identify one mistake, excuse or weak choice and take one concrete corrective action.",xp:25}];
+  function forgeCompletions(){if(!state.forgeCompletions)state.forgeCompletions={};if(!state.forgeCompletions[virtualToday()])state.forgeCompletions[virtualToday()]={};return state.forgeCompletions[virtualToday()];}
+  function forgeDayComplete(key){var c=state.forgeCompletions&&state.forgeCompletions[key];return !!c&&FORGE_TASKS.every(function(t){return !!c[t.id];});}
+  function forgeDays(){return Object.keys(state.forgeCompletions||{}).filter(forgeDayComplete).length;}
+  function forgeStreak(){var n=0,d=currentDay(state);for(var i=d;i>=1;i--){var x=new Date(state.startDate);x.setDate(x.getDate()+i-1);if(forgeDayComplete(x.toISOString().slice(0,10)))n++;else break;}return n;}
+  function totalForgeXp(){var n=0;Object.keys(state.forgeCompletions||{}).forEach(function(k){var c=state.forgeCompletions[k]||{};FORGE_TASKS.forEach(function(t){if(c[t.id])n+=t.xp;});});return n;}
+  function renderForge(){var c=forgeCompletions(),done=0;document.getElementById("forgeTaskList").innerHTML=FORGE_TASKS.map(function(t){var ok=!!c[t.id];if(ok)done++;return '<div class="forge-task '+(ok?'done':'')+'" data-forge-task="'+t.id+'" data-forge-xp="'+t.xp+'"><div class="forge-check"></div><div class="forge-task-main"><div class="forge-task-title">'+t.title+'</div><div class="forge-task-note">'+t.note+'</div></div><div class="forge-xp">+'+t.xp+'</div></div>';}).join('');document.getElementById("forgeProgressFill").style.width=(done/FORGE_TASKS.length*100)+"%";document.getElementById("forgeXp").textContent=totalForgeXp();document.getElementById("forgeStreak").textContent=forgeStreak();document.getElementById("forgeDays").textContent=forgeDays();document.querySelectorAll(".forge-task").forEach(function(r){r.addEventListener("click",function(){var id=r.dataset.forgeTask,xp=Number(r.dataset.forgeXp),c=forgeCompletions();if(c[id]){delete c[id];state.xp=Math.max(0,state.xp-xp);}else{c[id]=true;state.xp+=xp;toast("Forge +"+xp+" XP");}save();renderForge();renderToday();renderProgress();});});}
+
+  // ---------- State ----------
+  function defaultState(){
+    return {
+      name:"", startDate: todayISO(), devOffset:0,
+      xp:0, completions:{}, // { "2026-08-05": {s1:true, p1:true, ...} }
+      journal:{}, // { "2026-08-05": {q1,q2,q3} }
+      longestStreak:0, unlocked:{}, forgeCompletions:{}
+    };
+  }
+  var state = load();
+
+  function load(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(raw){var merged=Object.assign(defaultState(), JSON.parse(raw));if(!merged.forgeCompletions)merged.forgeCompletions={};return merged;}
+    }catch(e){}
+    return null;
+  }
+  function save(){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+  }
+  function todayISO(){ return new Date().toISOString().slice(0,10); }
+  function virtualToday(){
+    var d = new Date();
+    d.setDate(d.getDate() + (state.devOffset||0));
+    return d.toISOString().slice(0,10);
+  }
+  function currentDay(s){
+    var start = new Date(s.startDate);
+    var now = new Date(virtualToday());
+    var diff = Math.round((now-start)/86400000)+1;
+    return Math.max(1, diff);
+  }
+  function stageFor(day){
+    for(var i=0;i<STAGES.length;i++){ if(day>=STAGES[i].from && day<=STAGES[i].to) return STAGES[i]; }
+    return STAGES[STAGES.length-1];
+  }
+
+  // ---------- Onboarding ----------
+  var nameInput = document.getElementById("nameInput");
+  var startBtn = document.getElementById("startBtn");
+  nameInput.addEventListener("input", function(){ startBtn.disabled = nameInput.value.trim().length===0; });
+  startBtn.addEventListener("click", function(){
+    state = defaultState();
+    state.name = nameInput.value.trim();
+    save();
+    boot();
+  });
+
+  if(state && state.name){ boot(); }
+
+  function boot(){
+    document.getElementById("onboarding").classList.add("hidden");
+    var app = document.getElementById("app");
+    app.classList.remove("hidden");
+    document.getElementById("userName").textContent = state.name;
+    wireNav();
+    document.getElementById("saveJournalBtn").addEventListener("click", saveJournal);
+    document.getElementById("advanceDayBtn").addEventListener("click", function(){
+      state.devOffset = (state.devOffset||0)+1;
+      save();
+      renderAll();
+      toast("Advanced to the next day");
+    });
+    document.getElementById("backDayBtn").addEventListener("click", function(){
+      state.devOffset = (state.devOffset||0)-1;
+      save();
+      renderAll();
+      toast("Moved back a day");
+    });
+    document.getElementById("resetDayBtn").addEventListener("click", function(){
+      if(!confirm("Reset the day counter to Day 1? Your XP, streak record, journal, and achievements stay as they are — only the day number and today's checklist reset.")) return;
+      state.startDate = todayISO();
+      state.devOffset = 0;
+      save();
+      renderAll();
+      toast("Back to Day 1");
+    });
+    document.getElementById("eraseAllBtn").addEventListener("click", function(){
+      if(!confirm("Erase ALL data — XP, streaks, journal entries, achievements — and start over from onboarding? This cannot be undone.")) return;
+      try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+      location.reload();
+    });
+    renderAll();
+  }
+
+  function wireNav(){
+    var btns = document.querySelectorAll("nav button");
+    btns.forEach(function(b){
+      b.addEventListener("click", function(){
+        btns.forEach(function(x){x.classList.remove("active");});
+        b.classList.add("active");
+        document.querySelectorAll(".view").forEach(function(v){v.classList.add("hidden");});
+        document.getElementById("view-"+b.dataset.view).classList.remove("hidden");
+        if(b.dataset.view==="journal") loadJournalDraft();
+        if(b.dataset.view==="forge") renderForge();
+      });
+    });
+  }
+
+  // ---------- Render ----------
+  function renderAll(){
+    renderToday();
+    renderForge();
+    renderIdentities();
+    renderJournalList();
+    renderProgress();
+    checkAchievements(true);
+  }
+
+  function renderToday(){
+    var day = currentDay(state);
+    var stage = stageFor(day);
+    var dateKey = virtualToday();
+    var comp = state.completions[dateKey] || {};
+
+    document.getElementById("dayNum").textContent = Math.min(day,40);
+    document.getElementById("stageName").textContent = stage.name;
+    document.getElementById("levelNum").textContent = "1";
+    document.getElementById("levelName").textContent = "Foundation";
+
+    var level = Math.floor(state.xp/1000)+1;
+    var levelFloor = (level-1)*1000, levelCeil = level*1000;
+    var pct = ((state.xp-levelFloor)/(levelCeil-levelFloor))*100;
+    document.getElementById("xpNow").textContent = state.xp+" XP";
+    document.getElementById("xpNext").textContent = (levelCeil-state.xp)+" to next milestone";
+    document.getElementById("xpFill").style.width = pct+"%";
+
+    var totalTasks=0, doneTasks=0;
+    var html = "";
+    PILLARS.forEach(function(p){
+      var tasks = stage.tasks[p.id];
+      var pillarDone=0;
+      var rows = tasks.map(function(t){
+        var checked = !!comp[t.id];
+        if(checked) pillarDone++;
+        totalTasks++; if(checked) doneTasks++;
+        return '<div class="task-row '+(checked?'done':'')+'" data-task="'+t.id+'" data-pillar="'+p.id+'" data-xp="'+t.xp+'">'+
+          '<div class="checkbox '+(checked?'checked':'')+'">'+ICONS.check+'</div>'+
+          '<div class="task-label">'+t.label+'</div>'+
+          '<div class="task-xp">+'+t.xp+'</div>'+
+        '</div>';
+      }).join("");
+      html += '<div class="pillar-card">'+
+        '<div class="pillar-head">'+
+          '<div class="pillar-icon" style="background:'+p.bg+'">'+p.icon+'</div>'+
+          '<div><div class="pillar-name">'+p.name+'</div><div class="pillar-sub">'+p.sub+'</div></div>'+
+          '<div class="pillar-progress">'+pillarDone+'/'+tasks.length+'</div>'+
+        '</div>'+ rows +
+      '</div>';
+    });
+    document.getElementById("pillarList").innerHTML = html;
+
+    document.querySelectorAll(".task-row").forEach(function(row){
+      row.addEventListener("click", function(){ toggleTask(row.dataset.pillar, row.dataset.task, Number(row.dataset.xp)); });
+    });
+
+    updateScale(totalTasks? doneTasks/totalTasks : 0, doneTasks, totalTasks);
+  }
+
+  function updateScale(ratio, done, total){
+    var beam = document.getElementById("beam");
+    var angle = -14 + ratio*14; // tilts from -14deg toward level(0) as balance increases
+    beam.setAttribute("transform","translate(110,52) rotate("+angle+")");
+    var caption = document.getElementById("scaleCaption");
+    if(total===0){ caption.innerHTML = "Nothing to weigh yet today"; }
+    else if(done===0){ caption.innerHTML = "The scale awaits your first deed"; }
+    else if(done<total){ caption.innerHTML = "<b>"+done+" of "+total+"</b> weighed in today"; }
+    else{ caption.innerHTML = "<b>Balanced.</b> Today is complete."; }
+  }
+
+  function toggleTask(pillarId, taskId, xp){
+    var dateKey = virtualToday();
+    if(!state.completions[dateKey]) state.completions[dateKey] = {};
+    var comp = state.completions[dateKey];
+    if(comp[taskId]){
+      delete comp[taskId];
+      state.xp = Math.max(0, state.xp - xp);
+    }else{
+      comp[taskId] = true;
+      state.xp += xp;
+      toast("+"+xp+" XP");
+    }
+    recomputeStreaks();
+    save();
+    renderToday();
+    renderIdentities();
+    renderProgress();
+    checkAchievements();
+  }
+
+  function isDayComplete(dateKey, dayNumber){
+    var stage = stageFor(dayNumber);
+    var comp = state.completions[dateKey] || {};
+    var allTasks = [].concat(stage.tasks.spiritual, stage.tasks.physical, stage.tasks.mental, stage.tasks.financial);
+    return allTasks.length>0 && allTasks.every(function(t){ return !!comp[t.id]; });
+  }
+
+  function recomputeStreaks(){
+    var day = currentDay(state);
+    var streak = 0;
+    for(var d=day; d>=1; d--){
+      var date = new Date(state.startDate);
+      date.setDate(date.getDate() + (d-1));
+      var key = date.toISOString().slice(0,10);
+      if(isDayComplete(key, d)){ streak++; } else { break; }
+    }
+    state.currentStreak = streak;
+    if(streak > (state.longestStreak||0)) state.longestStreak = streak;
+  }
+
+  function renderIdentities(){
+    var counts = {}; // identity -> completions count (all-time)
+    IDENTITIES.forEach(function(i){ counts[i.id]=0; });
+    Object.keys(state.completions).forEach(function(dateKey){
+      var comp = state.completions[dateKey];
+      Object.keys(comp).forEach(function(taskId){
+        if(!comp[taskId]) return;
+        var pillar = taskId[0]==="s"?"spiritual":taskId[0]==="p"?"physical":taskId[0]==="m"?"mental":"financial";
+        IDENTITIES.forEach(function(idn){ if(idn.pillars.indexOf(pillar)>=0) counts[idn.id]++; });
+      });
+    });
+
+    var html = "";
+    IDENTITIES.forEach(function(idn){
+      if(idn.locked){
+        html += '<div class="identity-card locked">'+
+          '<div class="identity-top"><div class="identity-name">'+idn.name+'</div><div class="identity-mastery">🔒 Locked</div></div>'+
+          '<div class="identity-bar-bg"><div class="identity-bar-fill" style="width:0%;background:#555"></div></div>'+
+          '<div class="identity-desc">'+idn.desc+'</div>'+
+        '</div>';
+        return;
+      }
+      var c = counts[idn.id];
+      var mIdx=0;
+      for(var i=MASTERY_THRESHOLDS.length-1;i>=0;i--){ if(c>=MASTERY_THRESHOLDS[i]){ mIdx=i; break; } }
+      var nextThresh = MASTERY_THRESHOLDS[mIdx+1] || (MASTERY_THRESHOLDS[mIdx]+60);
+      var pct = Math.min(100, (c/nextThresh)*100);
+      html += '<div class="identity-card">'+
+        '<div class="identity-top"><div class="identity-name">'+idn.name+'</div><div class="identity-mastery">'+MASTERY_LABELS[mIdx]+'</div></div>'+
+        '<div class="identity-bar-bg"><div class="identity-bar-fill" style="width:'+pct+'%;background:'+idn.color+'"></div></div>'+
+        '<div class="identity-desc">'+idn.desc+'</div>'+
+      '</div>';
+    });
+    document.getElementById("identityList").innerHTML = html;
+  }
+
+  // ---------- Journal ----------
+  function loadJournalDraft(){
+    var key = virtualToday();
+    var e = state.journal[key] || {q1:"",q2:"",q3:""};
+    document.getElementById("j1").value = e.q1;
+    document.getElementById("j2").value = e.q2;
+    document.getElementById("j3").value = e.q3;
+  }
+  function saveJournal(){
+    var key = virtualToday();
+    state.journal[key] = {
+      q1: document.getElementById("j1").value.trim(),
+      q2: document.getElementById("j2").value.trim(),
+      q3: document.getElementById("j3").value.trim()
+    };
+    save();
+    renderJournalList();
+    checkAchievements();
+    toast("Reflection saved");
+  }
+  function renderJournalList(){
+    var keys = Object.keys(state.journal).sort().reverse();
+    if(keys.length===0){ document.getElementById("journalList").innerHTML = '<p class="muted" style="font-size:13px;">No entries yet. Your first reflection will appear here.</p>'; return; }
+    var html = keys.map(function(k){
+      var e = state.journal[k];
+      var d = new Date(k+"T00:00:00");
+      var label = d.toLocaleDateString(undefined,{weekday:'short', month:'short', day:'numeric'});
+      return '<div class="entry"><div class="entry-date">'+label+'</div>'+
+        (e.q1?'<p><b>Pleased:</b> '+escapeHtml(e.q1)+'</p>':'')+
+        (e.q2?'<p><b>Improve:</b> '+escapeHtml(e.q2)+'</p>':'')+
+        (e.q3?'<p><b>Tomorrow:</b> '+escapeHtml(e.q3)+'</p>':'')+
+      '</div>';
+    }).join("");
+    document.getElementById("journalList").innerHTML = html;
+  }
+  function escapeHtml(s){ var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+  // ---------- Progress ----------
+  function renderProgress(){
+    document.getElementById("statXp").textContent = state.xp;
+    document.getElementById("statStreak").textContent = state.currentStreak||0;
+    document.getElementById("statBest").textContent = state.longestStreak||0;
+    document.getElementById("statDay").textContent = Math.min(currentDay(state),40);
+
+    var html = ACHIEVEMENTS.map(function(a){
+      var got = !!state.unlocked[a.id];
+      return '<div class="badge '+(got?'':'locked')+'"><div class="b-icon">'+a.icon+'</div>'+
+        '<div><div class="b-name">'+a.name+'</div><div class="b-desc">'+a.desc+'</div></div></div>';
+    }).join("");
+    document.getElementById("badgeGrid").innerHTML = html;
+  }
+
+  function checkAchievements(silent){
+    ACHIEVEMENTS.forEach(function(a){
+      if(!state.unlocked[a.id] && a.cond(state)){
+        state.unlocked[a.id] = true;
+        if(!silent) toast("🏆 "+a.name+" unlocked");
+      }
+    });
+    save();
+  }
+
+  // ---------- Toast ----------
+  var toastTimer;
+  function toast(msg){
+    var t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.classList.remove("show"); }, 1600);
+  }
+
+  if(state){ recomputeStreaks(); }
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./service-worker.js');
+  });
+}
+</script>
+</body>
+
+</html>
