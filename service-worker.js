@@ -1,12 +1,51 @@
-const CACHE='mizan-alpha-v1';
-const ASSETS=['./','./index.html','./manifest.webmanifest'];
-self.addEventListener('install',e=>{
- e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)));
- self.skipWaiting();
+const CACHE_NAME = 'mizan-v3';
+
+const APP_SHELL = [
+  './',
+  './index.html',
+  './manifest.webmanifest'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_SHELL))
+      .then(() => self.skipWaiting())
+  );
 });
-self.addEventListener('activate',e=>{
- e.waitUntil(self.clients.claim());
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
 });
-self.addEventListener('fetch',e=>{
- e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request).then(cached => {
+      return cached || fetch(event.request).then(response => {
+        if (
+          response &&
+          response.status === 200 &&
+          response.type === 'basic'
+        ) {
+          const copy = response.clone();
+
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, copy);
+          });
+        }
+
+        return response;
+      });
+    })
+  );
 });
