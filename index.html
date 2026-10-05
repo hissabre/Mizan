@@ -21,7 +21,7 @@ header{position:sticky;top:0;z-index:10;padding:18px 20px 14px;background:linear
 textarea,input,select{width:100%;background:var(--ink);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:11px 12px;outline:none}textarea:focus,input:focus,select:focus{border-color:var(--gold)}textarea{min-height:85px;resize:vertical}.field{margin-bottom:12px}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .metric{display:flex;justify-content:space-between;align-items:center;padding:11px 0;border-top:1px solid var(--line)}.metric:first-child{border-top:0}.metric-name{font-size:13px}.metric-value{font-family:var(--serif);font-size:20px;color:var(--gold)}.range{width:100%}
 .review-q{margin-bottom:14px}.review-q label{display:block;color:var(--gold);font-family:var(--serif);font-size:15px;margin-bottom:6px}.review-q small{display:block;color:var(--muted);font-size:10px;margin-top:4px}.rating{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:8px}.rating button{border:1px solid var(--line);background:var(--ink);color:var(--muted);border-radius:7px;padding:7px 0;font-size:10px}.rating button.active{background:var(--gold);color:#241B08;border-color:var(--gold);font-weight:700}
-.empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:13px;line-height:1.6}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(18,33,31,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:7px 5px calc(8px + env(safe-area-inset-bottom));z-index:20}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:6px 2px}.nav button.active{color:var(--gold)}.nav .ni{display:block;font-size:18px;margin-bottom:3px}.toast{position:fixed;z-index:50;bottom:88px;left:50%;transform:translate(-50%,20px);opacity:0;background:var(--gold);color:#241B08;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty{text-align:center;padding:24px 12px;color:var(--muted);font-size:13px;line-height:1.6}.islamic-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.source{font-size:10px;color:var(--gold);margin-top:10px}.arabic{font-family:Tahoma,Arial,sans-serif;font-size:24px;line-height:1.9;text-align:right;direction:rtl;margin:10px 0}.islamic-card{background:linear-gradient(145deg,#213A35,#172824);border:1px solid var(--line);border-radius:18px;padding:17px;margin-bottom:12px}.practice{display:flex;gap:8px;flex-wrap:wrap}.practice button{border:1px solid var(--line);background:var(--ink);color:var(--muted);padding:9px 11px;border-radius:10px;font-size:11px}.practice button.done{background:var(--gold);color:#241B08;border-color:var(--gold);font-weight:700}.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(560px,100%);display:grid;grid-template-columns:repeat(6,1fr);background:rgba(18,33,31,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:7px 5px calc(8px + env(safe-area-inset-bottom));z-index:20}.nav button{background:none;border:0;color:var(--muted);font-size:10px;padding:6px 2px}.nav button.active{color:var(--gold)}.nav .ni{display:block;font-size:18px;margin-bottom:3px}.toast{position:fixed;z-index:50;bottom:88px;left:50%;transform:translate(-50%,20px);opacity:0;background:var(--gold);color:#241B08;padding:10px 16px;border-radius:999px;font-size:12px;font-weight:700;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:390px){.pillars{grid-template-columns:1fr}.hero h1{font-size:24px}}
 </style>
 </head>
@@ -62,19 +62,53 @@ textarea,input,select{width:100%;background:var(--ink);border:1px solid var(--li
 <div class="section-title">Life metrics</div><div class="card"><div class="metric"><div class="metric-name">Body weight</div><div><input id="mWeight" type="number" step="0.1" placeholder="kg" style="width:90px;text-align:right"></div></div><div class="metric"><div class="metric-name">Waist</div><div><input id="mWaist" type="number" step="0.1" placeholder="cm" style="width:90px;text-align:right"></div></div><div class="metric"><div class="metric-name">Sleep</div><div><input id="mSleep" type="number" step="0.1" placeholder="hours" style="width:90px;text-align:right"></div></div><button class="btn primary" style="width:100%;margin-top:12px" onclick="saveMetrics()">Save today's metrics</button></div>
 <div class="section-title">Principle</div><div class="card" style="font-family:var(--serif);line-height:1.6">“The point is not to become perfect. The point is to close the distance between the man you know you can be and the man you are on an ordinary Tuesday.”</div>
 </section>
+<section id="view-islam" class="view hidden">
+<div class="hero"><div class="kicker">Islam</div><h1>Remember why you are building the life.</h1><p>Qur’an, authentic Sunnah, worship and reminders—kept close to the formation system.</p><div class="quote" id="dailyIslamicReminder"></div><div class="source" id="dailyIslamicSource"></div></div>
+<div class="section-title">Today’s worship check-in</div>
+<div class="card"><div class="practice" id="salahPractice"></div><div class="practice" style="margin-top:10px"><button id="quranPractice" onclick="togglePractice('quran')">Qur’an</button><button id="dhikrPractice" onclick="togglePractice('dhikr')">Dhikr</button><button id="servicePractice" onclick="togglePractice('service')">Service / sadaqah</button></div><p class="muted" style="font-size:10px;line-height:1.5;margin:12px 0 0">This is a reflection tool, not a replacement for prayer times or a qualified scholar.</p></div>
+<div class="section-title">Qur’an for formation</div><div id="quranLibrary"></div>
+<div class="section-title">Authentic hadith</div><div id="hadithLibrary"></div>
+<div class="section-title">A useful question</div><div class="card"><div class="quote" style="margin:0;font-size:17px">“What would change today if I genuinely remembered that Allah sees me?”</div></div>
+</section>
 </main>
-<nav id="nav" class="nav hidden"><button data-view="today" class="active"><span class="ni">☀</span>Today</button><button data-view="vision"><span class="ni">◎</span>Vision</button><button data-view="goals"><span class="ni">↗</span>Goals</button><button data-view="review"><span class="ni">☾</span>Review</button><button data-view="progress"><span class="ni">▥</span>Progress</button></nav>
+<nav id="nav" class="nav hidden"><button data-view="today" class="active"><span class="ni">☀</span>Today</button><button data-view="vision"><span class="ni">◎</span>Vision</button><button data-view="goals"><span class="ni">↗</span>Goals</button><button data-view="review"><span class="ni">☾</span>Review</button><button data-view="progress"><span class="ni">▥</span>Progress</button><button data-view="islam"><span class="ni">☪</span>Islam</button></nav>
 <div id="toast" class="toast"></div>
 </div>
 <script>
 const KEY='mizan-life-os-v1';
-const defaultData={name:'',northStar:'Become a man who is deeply connected to Allah, governs himself rather than being governed by his impulses, maintains a capable body and peaceful mind, is deeply present for his family, and uses his abilities and freedom to serve others and experience Allah\'s creation.',focus90:'',focusWhy:'',tasks:[],ratings:{},reviews:[],metrics:[],night:{},goals:[
+const defaultData={name:'',northStar:'Become a man who is deeply connected to Allah, governs himself rather than being governed by his impulses, maintains a capable body and peaceful mind, is deeply present for his family, and uses his abilities and freedom to serve others and experience Allah\'s creation.',focus90:'',focusWhy:'',tasks:[],ratings:{},reviews:[],metrics:[],night:{},practice:{},goals:[
 {id:'deen',icon:'🕌',name:'Allah',subtitle:'Taqwa & worship',color:'gold',goal:'Become a man whose private and public character reflect his relationship with Allah.',year:'Protect salah, deepen Qur’an/Hifz, develop sincere repentance and Islamic character.'},
 {id:'self',icon:'🧠',name:'Self',subtitle:'Inner freedom & self-mastery',color:'teal',goal:'Become a man who can feel anything without being controlled by it.',year:'Break compulsive patterns; build peace, emotional regulation, attention and self-respect.'},
 {id:'body',icon:'🏃',name:'Body',subtitle:'Physical capability',color:'blue',goal:'Build and maintain a lean, strong, mobile, athletic body.',year:'Improve body composition, strength, conditioning, mobility, sleep and resilience.'},
 {id:'family',icon:'👨‍👧‍👦',name:'Family',subtitle:'Presence & responsibility',color:'rose',goal:'Become a father/husband whose family experiences him as reliable, loving, strong and present.',year:'Protect undistracted time, keep promises, teach by example and control ego when correcting.'},
 {id:'capability',icon:'🛠️',name:'Capability',subtitle:'Work, money, service & exploration',color:'gold',goal:'Become capable and financially free enough to use your abilities in service and experience the world.',year:'Increase earning power, build useful things, help people, learn, travel and create freedom.'}
 ]};
+
+const islamicContent={
+reminders:[
+{text:'Your life has a purpose beyond consumption: worship Allah and live that worship through your choices.',source:'Qur’an 51:56',url:'https://quran.com/51/56'},
+{text:'Look at what you are sending forward for tomorrow. Let today have a direction.',source:'Qur’an 59:18',url:'https://quran.com/59/18'},
+{text:'Change begins with what you change within yourself.',source:'Qur’an 13:11',url:'https://quran.com/13/11'},
+{text:'With hardship comes ease. Keep moving toward Allah without losing heart.',source:'Qur’an 94:5',url:'https://quran.com/94/5'},
+{text:'Seek what benefits you, ask Allah for help, and do not give up.',source:'Sahih Muslim 2664',url:'https://sunnah.com/muslim:2664'},
+{text:'The deeds most beloved to Allah are those maintained consistently, even when small.',source:'Sahih al-Bukhari 6464–6465',url:'https://sunnah.com/bukhari:6465'},
+{text:'The value of an action is tied to its intention. Renew yours before you begin.',source:'Sahih al-Bukhari 1',url:'https://sunnah.com/bukhari:1'}
+],
+quran:[
+{ref:'51:56',ar:'وَمَا خَلَقْتُ ٱلْجِنَّ وَٱلْإِنسَ إِلَّا لِيَعْبُدُونِ',en:'I did not create jinn and humans except to worship Me.',url:'https://quran.com/51/56'},
+{ref:'59:18',ar:'يَٰٓأَيُّهَا ٱلَّذِينَ ءَامَنُوا۟ ٱتَّقُوا۟ ٱللَّهَ وَلْتَنظُرْ نَفْسٌۭ مَّا قَدَّمَتْ لِغَدٍۢ',en:'O believers! Be mindful of Allah and let every soul look to what it has sent forth for tomorrow.',url:'https://quran.com/59/18'},
+{ref:'13:11',ar:'إِنَّ ٱللَّهَ لَا يُغَيِّرُ مَا بِقَوْمٍ حَتَّىٰ يُغَيِّرُوا۟ مَا بِأَنفُسِهِمْ',en:'Indeed, Allah will not change the condition of a people until they change what is in themselves.',url:'https://quran.com/13/11'},
+{ref:'94:5–6',ar:'فَإِنَّ مَعَ ٱلْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ ٱلْعُسْرِ يُسْرًا',en:'Surely with hardship comes ease. Surely with hardship comes ease.',url:'https://quran.com/94/5-6'},
+{ref:'3:159',ar:'فَإِذَا عَزَمْتَ فَتَوَكَّلْ عَلَى ٱللَّهِ',en:'Once you have made a decision, put your trust in Allah.',url:'https://quran.com/3/159'},
+{ref:'65:2–3',ar:'وَمَن يَتَّقِ ٱللَّهَ يَجْعَل لَّهُۥ مَخْرَجًا ۝ وَيَرْزُقْهُۥ مِنْ حَيْثُ لَا يَحْتَسِبُ',en:'Whoever is mindful of Allah, He will make a way out for them and provide for them from where they do not expect.',url:'https://quran.com/65/2-3'}
+],
+hadith:[
+{title:'Intentions',text:'Actions are judged by intentions, and each person will have what they intended.',source:'Sahih al-Bukhari 1',url:'https://sunnah.com/bukhari:1'},
+{title:'Strength & agency',text:'The strong believer is better and more beloved to Allah; seek what benefits you, seek Allah’s help, and do not give up.',source:'Sahih Muslim 2664',url:'https://sunnah.com/muslim:2664'},
+{title:'Consistency',text:'The deeds most beloved to Allah are the most regular, even if they are few.',source:'Sahih al-Bukhari 6464–6465',url:'https://sunnah.com/bukhari:6465'},
+{title:'Qadr & resilience',text:'When something befalls you, do not become trapped in “if only”; remember Allah’s decree and what He wills.',source:'Sahih Muslim 2664',url:'https://sunnah.com/muslim:2664'}
+]};
+
 let data=load();
 function load(){try{return {...defaultData,...JSON.parse(localStorage.getItem(KEY)||'{}')}}catch(e){return structuredClone(defaultData)}}
 function save(){localStorage.setItem(KEY,JSON.stringify(data))}
@@ -83,7 +117,7 @@ function toast(s){const t=document.getElementById('toast');t.textContent=s;t.cla
 function boot(){if(data.name){document.getElementById('onboarding').classList.add('hidden');document.getElementById('header').classList.remove('hidden');document.getElementById('views').classList.remove('hidden');document.getElementById('nav').classList.remove('hidden');document.getElementById('userName').textContent=data.name;renderAll()}else document.getElementById('startBtn').disabled=true}
 document.getElementById('nameInput').addEventListener('input',e=>document.getElementById('startBtn').disabled=!e.target.value.trim());
 document.getElementById('startBtn').onclick=()=>{data.name=document.getElementById('nameInput').value.trim();save();boot()};
-function renderAll(){renderToday();renderVision();renderGoals();renderReview();renderProgress();document.getElementById('northStar').value=data.northStar;document.getElementById('focus90').value=data.focus90;document.getElementById('focusWhy').value=data.focusWhy}
+function renderAll(){renderToday();renderVision();renderGoals();renderReview();renderProgress();renderIslam();document.getElementById('northStar').value=data.northStar;document.getElementById('focus90').value=data.focus90;document.getElementById('focusWhy').value=data.focusWhy}
 function todayKey(){return new Date().toISOString().slice(0,10)}
 function renderToday(){
 const p=document.getElementById('todayPillars');p.innerHTML=data.goals.map(g=>{const r=data.ratings[todayKey()]?.[g.id]||0;return `<div class="pillar"><div class="icon">${g.icon}</div><h3>${esc(g.name)}</h3><p>${esc(g.subtitle)}</p><div class="row between" style="margin-top:8px"><span class="muted" style="font-size:10px">Today</span><span class="score">${r||'—'}/10</span></div><div class="bar"><div style="width:${r*10}%"></div></div></div>`}).join('');
@@ -101,7 +135,29 @@ function saveFocus(){data.focus90=document.getElementById('focus90').value.trim(
 function saveNight(){data.night[todayKey()]=document.getElementById('nightIntegrity').value.trim();save();toast('Reflection saved')}
 function saveReview(){const r={date:todayKey(),good:document.getElementById('rGood').value,drift:document.getElementById('rDrift').value,why:document.getElementById('rWhy').value,one:document.getElementById('rOne').value};data.reviews.push(r);save();document.getElementById('rGood').value='';document.getElementById('rDrift').value='';document.getElementById('rWhy').value='';document.getElementById('rOne').value='';renderReview();toast('Weekly Mizan saved')}
 function saveMetrics(){const m={date:todayKey(),weight:document.getElementById('mWeight').value,waist:document.getElementById('mWaist').value,sleep:document.getElementById('mSleep').value};data.metrics.push(m);save();toast('Metrics saved')}
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('view-'+b.dataset.view).classList.remove('hidden');window.scrollTo(0,0);renderAll()});
+
+function dayIndex(n){const d=new Date();const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)%n}
+function renderIslam(){
+const reminder=islamicContent.reminders[dayIndex(islamicContent.reminders.length)];document.getElementById('dailyIslamicReminder').textContent='“'+reminder.text+'”';document.getElementById('dailyIslamicSource').innerHTML='<a href="'+reminder.url+'" target="_blank" rel="noopener" style="color:var(--gold)">'+esc(reminder.source)+' ↗</a>';
+const prayers=['Fajr','Dhuhr','Asr','Maghrib','Isha'];document.getElementById('salahPractice').innerHTML=prayers.map(x=>{const k='salah-'+x.toLowerCase();const done=!!data.practice[todayKey()]?.[k];return '<button class="'+(done?'done':'')+'" onclick="togglePractice(\''+k+'\')">'+(done?'✓ ':'')+x+'</button>'}).join('');
+['quran','dhikr','service'].forEach(k=>{const el=document.getElementById(k+'Practice');if(el)el.classList.toggle('done',!!data.practice[todayKey()]?.[k]);});
+document.getElementById('quranLibrary').innerHTML=islamicContent.quran.map(v=>'<div class="islamic-card"><div class="kicker">Qur’an · '+v.ref+'</div><div class="arabic">'+v.ar+'</div><div style="font-size:13px;line-height:1.55">'+esc(v.en)+'</div><div class="source"><a href="'+v.url+'" target="_blank" rel="noopener" style="color:var(--gold)">Read in Qur’an ↗</a></div></div>').join('');
+document.getElementById('hadithLibrary').innerHTML=islamicContent.hadith.map(h=>'<div class="card"><div class="row between"><h3 style="margin:0;font-size:17px">'+esc(h.title)+'</h3><span class="pill">Authentic</span></div><p style="font-size:13px;line-height:1.55;margin:10px 0 0">'+esc(h.text)+'</p><div class="source"><a href="'+h.url+'" target="_blank" rel="noopener" style="color:var(--gold)">'+esc(h.source)+' ↗</a></div></div>').join('');
+}
+function togglePractice(k){if(!data.practice[todayKey()])data.practice[todayKey()]={};data.practice[todayKey()][k]=!data.practice[todayKey()][k];save();renderIslam();toast(data.practice[todayKey()][k]?'Marked complete':'Unmarked')}
+
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>{
+function dayIndex(n){const d=new Date();const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)%n}
+function renderIslam(){
+const reminder=islamicContent.reminders[dayIndex(islamicContent.reminders.length)];document.getElementById('dailyIslamicReminder').textContent='“'+reminder.text+'”';document.getElementById('dailyIslamicSource').innerHTML='<a href="'+reminder.url+'" target="_blank" rel="noopener" style="color:var(--gold)">'+esc(reminder.source)+' ↗</a>';
+const prayers=['Fajr','Dhuhr','Asr','Maghrib','Isha'];document.getElementById('salahPractice').innerHTML=prayers.map(x=>{const k='salah-'+x.toLowerCase();const done=!!data.practice[todayKey()]?.[k];return '<button class="'+(done?'done':'')+'" onclick="togglePractice(\''+k+'\')">'+(done?'✓ ':'')+x+'</button>'}).join('');
+['quran','dhikr','service'].forEach(k=>{const el=document.getElementById(k+'Practice');if(el)el.classList.toggle('done',!!data.practice[todayKey()]?.[k]);});
+document.getElementById('quranLibrary').innerHTML=islamicContent.quran.map(v=>'<div class="islamic-card"><div class="kicker">Qur’an · '+v.ref+'</div><div class="arabic">'+v.ar+'</div><div style="font-size:13px;line-height:1.55">'+esc(v.en)+'</div><div class="source"><a href="'+v.url+'" target="_blank" rel="noopener" style="color:var(--gold)">Read in Qur’an ↗</a></div></div>').join('');
+document.getElementById('hadithLibrary').innerHTML=islamicContent.hadith.map(h=>'<div class="card"><div class="row between"><h3 style="margin:0;font-size:17px">'+esc(h.title)+'</h3><span class="pill">Authentic</span></div><p style="font-size:13px;line-height:1.55;margin:10px 0 0">'+esc(h.text)+'</p><div class="source"><a href="'+h.url+'" target="_blank" rel="noopener" style="color:var(--gold)">'+esc(h.source)+' ↗</a></div></div>').join('');
+}
+function togglePractice(k){if(!data.practice[todayKey()])data.practice[todayKey()]={};data.practice[todayKey()][k]=!data.practice[todayKey()][k];save();renderIslam();toast(data.practice[todayKey()][k]?'Marked complete':'Unmarked')}
+
+document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));document.getElementById('view-'+b.dataset.view).classList.remove('hidden');window.scrollTo(0,0);renderAll()});
 document.getElementById('modeBtn').onclick=()=>{const n=prompt('Change your name:',data.name);if(n&&n.trim()){data.name=n.trim();save();document.getElementById('userName').textContent=data.name;toast('Updated')}};
 boot();
 </script>
