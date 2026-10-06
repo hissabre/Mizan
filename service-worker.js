@@ -1,8 +1,10 @@
-const CACHE_NAME = 'mizan-v4';
+const CACHE_NAME = 'mizan-v5';
 const APP_SHELL = [
   './',
   './index.html',
-  './manifest.webmanifest'
+  './manifest.webmanifest',
+  './icon-192.png',
+  './icon-512.png'
 ];
 
 self.addEventListener('install', event => {
