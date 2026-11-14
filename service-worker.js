@@ -1,60 +1,36 @@
-const CACHE_NAME = 'mizan-v5';
-const APP_SHELL = [
-  './',
-  './index.html',
-  './manifest.webmanifest',
-  './icon-192.png',
-  './icon-512.png'
-];
+/* Mizan service worker: network-first, so a new index.html always wins when online,
+   with the cached copy as the offline fallback. Bump VERSION to force a clean cache. */
+const VERSION = 'mizan-v3';
+const CORE = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(APP_SHELL))
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(VERSION)
+      .then(c => Promise.all(CORE.map(u => c.add(u).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
 
-self.addEventListener('activate', event => {
-  event.waitUntil(
+self.addEventListener('activate', e => {
+  e.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      ))
+      .then(keys => Promise.all(keys.filter(k => k !== VERSION).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
-self.addEventListener('fetch', event => {
-  if (event.request.method !== 'GET') return;
-
-  // Always try the network first for page navigations so GitHub Pages
-  // updates are picked up instead of serving an old index.html.
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
-          return response;
-        })
-        .catch(() => caches.match('./index.html'))
-    );
-    return;
-  }
-
-  event.respondWith(
-    caches.match(event.request).then(cached => {
-      if (cached) return cached;
-      return fetch(event.request).then(response => {
-        if (response && response.status === 200 && response.type === 'basic') {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+self.addEventListener('fetch', e => {
+  const req = e.request;
+  if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  e.respondWith(
+    fetch(req)
+      .then(res => {
+        if (res && res.ok) {
+          const copy = res.clone();
+          caches.open(VERSION).then(c => c.put(req, copy));
         }
-        return response;
-      });
-    })
+        return res;
+      })
+      .catch(() => caches.match(req).then(hit => hit || (req.mode === 'navigate' ? caches.match('index.html') : undefined)))
   );
 });

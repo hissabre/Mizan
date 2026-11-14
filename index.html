@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Mizan">
 <meta name="theme-color" content="#050814">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>Mizan</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚖️</text></svg>">
 <style>
@@ -756,6 +758,9 @@ window.__mz={calcTimes,fmtT,TODAY};
 $('#tabs').innerHTML=TABS.map(t=>`<button data-act="tab" data-id="${t[0]}"><span class="i">${t[1]}</span>${t[2]}</button>`).join('');
 render(true);
 if(!S.seen)welcome();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('service-worker.js').catch(()=>{}));
+}
 })();
 </script>
 </body>
