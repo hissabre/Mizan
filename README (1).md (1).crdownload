@@ -1,0 +1,36 @@
+# Mizan
+
+A daily balance and growth app: four pillars, seven identities, a 40-day journey, per-prayer tracking and a 60-second evening check-in.
+
+Single-page web app, no build step, no server. Your data stays in your browser (localStorage).
+
+## Files
+
+| File | Purpose |
+|---|---|
+| `index.html` | The whole app |
+| `manifest.webmanifest` | Makes it installable (name, icons, colours) |
+| `service-worker.js` | Offline support; loads the newest version when online |
+| `icon-192.png`, `icon-512.png` | App icons |
+
+## Deploy on GitHub Pages
+
+1. Put all files in the repository root.
+2. Settings → Pages → Deploy from a branch → `main` / `(root)`.
+3. Open `https://<username>.github.io/<repo>/`.
+
+> Pages on a private repository needs a paid GitHub plan. On a free plan, make the repo public (nothing personal is stored in it; user data never leaves the device).
+
+## Install on iPhone
+
+Open the site in Safari → Share → Add to Home Screen.
+
+## Updating
+
+Replace `index.html` and commit. To force every device to refresh its offline copy, also bump `VERSION` in `service-worker.js` (e.g. `mizan-v5`).
+
+## Backup
+
+Me → Data → Export saves a JSON backup. Import restores it on any device.
+
+Prayer times are calculated on the device and are a guide only; follow your local mosque.
